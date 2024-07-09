@@ -1,6 +1,5 @@
+#include "glad/glad.h"
 #include "shader.hpp"
-
-#include <glad/glad.h>
 
 #include <fstream>
 #include <iostream>
@@ -80,4 +79,9 @@ Shader::Shader (const char* vertexShaderPath, const char* fragmentShaderPath)
 void Shader::use ()
 {
     glUseProgram(this->programID);
+}
+
+void Shader::setMat4 (const std::string &name, const glm::mat4 &mat) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(this->programID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
