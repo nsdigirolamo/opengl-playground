@@ -1,7 +1,10 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <shader.hpp>
+#include "glad/glad.h"
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include "camera.hpp"
+#include "shader.hpp"
 
+#include <GLFW/glfw3.h>
 #include <iostream>
 
 constexpr unsigned int WINDOW_WIDTH = 768;
@@ -47,6 +50,8 @@ int main ()
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     glfwSetKeyCallback(window, keyCallback);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     if (!gladLoadGLLoader((GLADloadproc)(glfwGetProcAddress)))
     {
         std::cerr << "GLFW Error: Failed to initialize GLAD.";
@@ -82,12 +87,42 @@ int main ()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    Camera camera;
+
+    double previousTime = glfwGetTime();
+
     while (!glfwWindowShouldClose(window))
     {
+        double currentTime = glfwGetTime();
+        double deltaTime = currentTime - previousTime;
+        previousTime = currentTime;
+        camera.processKeyInput(window, deltaTime);
+
+        double xPos;
+        double yPos;
+        glfwGetCursorPos(window, &xPos, &yPos);
+        camera.processMouseInput(glm::vec2(xPos, yPos));
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.use();
+
+        glm::mat4 projection = glm::perspective(
+            glm::radians(camera.fov),
+            (float)(WINDOW_WIDTH) / (float)(WINDOW_HEIGHT),
+            0.1f,
+            100.0f
+        );
+
+        glm::mat4 view = camera.getLookAt();
+
+        glm::mat4 model = glm::mat4(1.0f);
+
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
+        shader.setMat4("model", model);
+
         glBindVertexArray(vertexArray);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
