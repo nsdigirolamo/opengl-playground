@@ -5,6 +5,7 @@ project(opengl-solitaire)
 set(SOLSOURCES
     src/glad.c
     src/shader.cpp
+    src/camera.cpp
     src/solitaire-window.cpp
 )
 
