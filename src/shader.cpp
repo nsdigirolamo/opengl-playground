@@ -17,7 +17,7 @@ void Shader::checkCompilerErrors (unsigned int shader, std::string type)
 
     if (!success) {
         glGetShaderInfoLog(shader, infoLength, NULL, info);
-        std::cerr << "Shader Compilation Error of Type: " << type << std::endl << "Info: " << info << std::endl;
+        std::cerr << "Shader Compilation Error of Type: " << type << std::endl << "Info: " << info;
     }
 }
 
