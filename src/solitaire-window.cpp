@@ -8,8 +8,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-constexpr unsigned int WINDOW_WIDTH = 768;
-constexpr unsigned int WINDOW_HEIGHT = 432;
+constexpr unsigned int WINDOW_WIDTH = 960;
+constexpr unsigned int WINDOW_HEIGHT = 540;
 
 void errorCallback (int error, const char* description)
 {
