@@ -44,7 +44,7 @@ int main ()
     {
         std::cerr << "GLFW Error: Failed to create a window." << std::endl;
         glfwTerminate();
-        exit(-1);
+        return -1;
     }
 
     glfwMakeContextCurrent(window);
@@ -57,7 +57,7 @@ int main ()
     {
         std::cerr << "GLFW Error: Failed to initialize GLAD.";
         glfwTerminate();
-        exit(-1);
+        return -1;
     }
 
     Shader shader { "shaders/shader.vs", "shaders/shader.fs" };
@@ -72,7 +72,7 @@ int main ()
     glBindVertexArray(vertexArray);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, model.getVerticesSize(), model.getVertices(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, model.getVertexDataSize(), model.getVertexData(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
     glEnableVertexAttribArray(0);
@@ -121,5 +121,5 @@ int main ()
     }
 
     glfwTerminate();
-    exit(0);
+    return 0;
 }
