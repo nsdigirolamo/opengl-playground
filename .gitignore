@@ -7,5 +7,8 @@ cmake_install.cmake
 CMakeCache.txt
 Makefile
 
+# Valgrind Files
+valgrind-out.txt
+
 # Executables
 solitaire
