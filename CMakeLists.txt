@@ -6,6 +6,7 @@ set(SOLSOURCES
     src/glad.c
     src/shader.cpp
     src/camera.cpp
+    src/model.cpp
     src/solitaire-window.cpp
 )
 
