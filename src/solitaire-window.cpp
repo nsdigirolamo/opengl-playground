@@ -60,7 +60,7 @@ int main ()
         exit(-1);
     }
 
-    Shader shader { "shaders/tri.vs", "shaders/tri.fs" };
+    Shader shader { "shaders/shader.vs", "shaders/shader.fs" };
 
     Model model { "models/teapot_bezier0.tris" };
 
