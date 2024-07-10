@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "camera.hpp"
 #include "shader.hpp"
+#include "model.hpp"
 
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -61,12 +62,7 @@ int main ()
 
     Shader shader { "shaders/tri.vs", "shaders/tri.fs" };
 
-    const float vertexData [] =
-    {   // Positions        // Colors
-        0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
-       -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
-        0.0f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f
-    };
+    Model model { "models/teapot_bezier0.tris" };
 
     unsigned int vertexArray, vertexBuffer;
 
@@ -74,18 +70,12 @@ int main ()
     glGenBuffers(1, &vertexBuffer);
 
     glBindVertexArray(vertexArray);
+
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, model.getVerticesSize(), model.getVertices(), GL_STATIC_DRAW);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
     glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 
     Camera camera;
 
@@ -104,27 +94,27 @@ int main ()
         camera.processMouseInput(glm::vec2(xPos, yPos));
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
 
-        glm::mat4 projection = glm::perspective(
+        glm::mat4 projectionMat = glm::perspective(
             glm::radians(camera.fov),
             (float)(WINDOW_WIDTH) / (float)(WINDOW_HEIGHT),
             0.1f,
             100.0f
         );
 
-        glm::mat4 view = camera.getLookAt();
+        glm::mat4 viewMat = camera.getLookAt();
 
-        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 modelMat = glm::mat4(1.0f);
 
-        shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
-        shader.setMat4("model", model);
+        shader.setMat4("projection", projectionMat);
+        shader.setMat4("view", viewMat);
+        shader.setMat4("model", modelMat);
 
         glBindVertexArray(vertexArray);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, model.getVertexCount());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
