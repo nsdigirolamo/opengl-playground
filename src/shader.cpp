@@ -51,6 +51,7 @@ Shader::Shader (const char* vertexShaderPath, const char* fragmentShaderPath)
     catch (std::ifstream::failure &e)
     {
         std::cerr << "Shader File Read Error: " << e.what() << std::endl;
+        exit(-1);
     }
 
     const char* vertexShaderString = vertexShaderSource.c_str();
