@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #define WORLD_UP glm::vec3(0, 1, 0)
-#define DEFAULT_SPEED 2.5f
+#define DEFAULT_SPEED 5.0f
 #define DEFAULT_SENSITIVITY 0.1f
 #define DEFAULT_YAW -90.0f
 #define DEFAULT_PITCH 0.0f

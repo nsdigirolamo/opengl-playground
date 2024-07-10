@@ -48,13 +48,19 @@ void Camera::processKeyInput (GLFWwindow* window, float deltaTime)
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         this->position += glm::normalize(glm::cross(this->forward, this->up)) * speed;
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        this->position += speed * this->up;
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        this->position -= speed * this->up;
 }
 
 void Camera::processMouseInput (glm::vec2 offset)
 {
     offset *= this->mouseSensitivity;
     this->yaw = offset.x;
-    this->pitch = offset.y;
+    this->pitch = -1.0 * offset.y;
 
     if (89.0 < this->pitch)
     {
