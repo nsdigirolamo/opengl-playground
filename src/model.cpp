@@ -25,19 +25,19 @@ Model::Model (const char* modelPath)
 
     stream >> this->triangleCount;
     this->vertexCount = this->triangleCount * 3;
-    this->verticesSize = this->vertexCount * 3 * sizeof(float);
+    this->vertexDataSize = this->vertexCount * 3 * sizeof(float);
 
-    this->vertices = (float*)(malloc(this->verticesSize));
+    this->vertexData = (float*)(malloc(this->vertexDataSize));
 
-    for (int i = 0; i < this->verticesSize; ++i)
+    for (int i = 0; i < this->vertexDataSize; ++i)
     {
-        stream >> this->vertices[i];
+        stream >> this->vertexData[i];
     }
 }
 
 Model::~Model ()
 {
-    free(this->vertices);
+    free(this->vertexData);
 }
 
 const unsigned int Model::getTriangleCount () const
@@ -50,27 +50,27 @@ const unsigned int Model::getVertexCount () const
     return this->vertexCount;
 }
 
-const size_t Model::getVerticesSize () const
+const size_t Model::getVertexDataSize () const
 {
-    return this->verticesSize;
+    return this->vertexDataSize;
 }
 
-const float* const Model::getVertices () const
+const float* const Model::getVertexData () const
 {
-    return this->vertices;
+    return this->vertexData;
 }
 
 std::ostream& operator<<(std::ostream& os, const Model& model)
 {
 
-    const float* const vertices = model.getVertices();
+    const float* const vertices = model.getVertexData();
 
-    for (int i = 0; i < model.getVerticesSize(); i += 3)
+    for (int i = 0; i < model.getVertexDataSize(); i += 3)
     {
         os << vertices[i] << " " << vertices[i + 1] << " " << vertices[i + 2] << std::endl;
     }
 
-    os << model.getTriangleCount() << " " << model.getVertexCount() << " " << model.getVerticesSize();
+    os << model.getTriangleCount() << " " << model.getVertexCount() << " " << model.getVertexDataSize();
 
     return os;
 }

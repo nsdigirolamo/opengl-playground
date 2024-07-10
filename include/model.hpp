@@ -11,8 +11,8 @@ class Model
         unsigned int triangleCount;
         unsigned int vertexCount;
 
-        size_t verticesSize;
-        float* vertices;
+        size_t vertexDataSize;
+        float* vertexData;
 
     public:
 
@@ -22,8 +22,8 @@ class Model
         const unsigned int getTriangleCount () const;
         const unsigned int getVertexCount () const;
 
-        const size_t getVerticesSize () const;
-        const float* const getVertices () const;
+        const size_t getVertexDataSize () const;
+        const float* const getVertexData () const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Model& data);
