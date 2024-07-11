@@ -1,4 +1,4 @@
-# OpenGl Solitaire
+# OpenGL Solitaire
 
 This is an OpenGL project I'm working on to teach myself the API. Eventually
 it will be a 3D solitaire game, but for now it's a playground I'm using to teach
