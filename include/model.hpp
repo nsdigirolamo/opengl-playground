@@ -4,6 +4,12 @@
 #include <stddef.h>
 #include <ostream>
 
+#define VERTICES_PER_TRIANGLE 3
+#define VERTEX_SIZE sizeof(float) * 3
+#define NORMAL_SIZE sizeof(float) * 3
+
+#define VERTEX_DATA_STRIDE 6
+
 class Model
 {
     private:
