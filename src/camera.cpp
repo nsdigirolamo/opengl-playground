@@ -1,6 +1,8 @@
 #include "camera.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include <iostream>
+
 void Camera::updateLookVectors ()
 {
     glm::vec3 newForward;
@@ -72,4 +74,15 @@ void Camera::processMouseInput (glm::vec2 offset)
     }
 
     updateLookVectors();
+}
+
+std::ostream& operator<<(std::ostream& os, const Camera& data)
+{
+    os << "Position: " << data.position.x << " " << data.position.y << " " << data.position.z << std::endl;
+    os << "Forward: " << data.forward.x << " " << data.forward.y << " " << data.forward.z << std::endl;
+    os << "Up: " << data.up.x << " " << data.up.y << " " << data.up.z << std::endl;
+    os << "Right: " << data.right.x << " " << data.right.y << " " << data.right.z << std::endl;
+    os << "Yaw: " << data.yaw << " Pitch: " << data.pitch;
+
+    return os;
 }

@@ -4,6 +4,7 @@
 #include "glm/glm.hpp"
 
 #include <GLFW/glfw3.h>
+#include <ostream>
 
 #define WORLD_UP glm::vec3(0, 1, 0)
 #define DEFAULT_SPEED 5.0f
@@ -40,5 +41,7 @@ class Camera
         void processKeyInput (GLFWwindow* window, float deltaTime);
         void processMouseInput (glm::vec2 offset);
 };
+
+std::ostream& operator<<(std::ostream& os, const Camera& data);
 
 #endif
