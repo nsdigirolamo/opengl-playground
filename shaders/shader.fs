@@ -5,6 +5,12 @@ in vec3 Norm;
 
 void main()
 {
-	vec3 crossed = cross(vec3(1.0, 0.0, 0.0), Norm);
-	FragColor = vec4(length(crossed), 0.0, 0.0, 1.0);
+	vec3 newNorm = Norm;
+	if (Norm.x < 0)
+		newNorm.x = Norm.x * -1;
+	if (Norm.y < 0)
+		newNorm.y = Norm.y * -1;
+	if (Norm.z < 0)
+		newNorm.z = Norm.z * -1;
+	FragColor = vec4(newNorm, 1.0);
 }
