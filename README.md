@@ -14,9 +14,9 @@ The [models](https://github.com/nsdigirolamo/opengl-solitaire/tree/main/models)
 directory contains a 3D model of the Utah Teapot sourced from
 [this webpage.](https://users.cs.utah.edu/~dejohnso/models/teapot.html)
 
-This project requires `cmake` to be installed on your system. To build from
-source, clone the repository and run the following commands while within the
-newly cloned directory:
+To build this project, make sure you have `cmake` and
+[GLFW](https://www.glfw.org/) installed on your system. Clone the repository 
+and run the following commands while within the newly cloned directory:
 
 ```bash
 cmake .
