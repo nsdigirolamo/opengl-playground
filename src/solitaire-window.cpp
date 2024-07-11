@@ -60,6 +60,8 @@ int main ()
         return -1;
     }
 
+    glEnable(GL_DEPTH_TEST);
+
     Shader shader { "shaders/shader.vs", "shaders/shader.fs" };
 
     Model model { "models/teapot_bezier0.tris" };
@@ -74,8 +76,11 @@ int main ()
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, model.getVertexDataSize(), model.getVertexData(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(0));
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     Camera camera;
 
