@@ -6,9 +6,9 @@ myself OpenGL with [this tutorial by Joey de Vries.](https://learnopengl.com/)
 
 This repository contains the following libraries:
 
-- glad.h [(license)](https://github.com/Dav1dde/glad/blob/glad2/LICENSE)
+- glad [(license)](https://github.com/Dav1dde/glad/blob/glad2/LICENSE)
 - glm [(license)](https://github.com/g-truc/glm/blob/master/manual.md#section0)
-- khrplatform.h
+- khrplatform
 
 The [models](https://github.com/nsdigirolamo/opengl-solitaire/tree/main/models)
 directory contains a 3D model of the Utah Teapot sourced from
