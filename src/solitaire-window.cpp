@@ -93,10 +93,10 @@ int main ()
         previousTime = currentTime;
         camera.processKeyInput(window, deltaTime);
 
-        double xPos;
-        double yPos;
-        glfwGetCursorPos(window, &xPos, &yPos);
-        camera.processMouseInput(glm::vec2(xPos, yPos));
+        double xCursorPos = 0;
+        double yCursorPos = 0;
+        glfwGetCursorPos(window, &xCursorPos, &yCursorPos);
+        camera.processMouseInput(glm::vec2(xCursorPos, yCursorPos));
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
