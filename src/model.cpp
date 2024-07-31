@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-Model::Model (const char* modelPath)
+Model::Model (const char* modelPath, glm::vec3 color)
 {
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -25,18 +25,19 @@ Model::Model (const char* modelPath)
     }
 
     stream >> this->triangleCount;
+    this->color = color;
 
     /**
-     * An element of the vertex data consists of 6 floats. The first 3 floats
-     * are the vertex's 3D position vector. The second 3 floats are the vertex's
-     * 3D normal vector that points in the direction of the triangle's outward
-     * face.
+     * An element of the vertex data consists of 9 floats.
+     * - The first 3 floats are the vertex's 3D position vector.
+     * - The second 3 floats are the vertex's 3D surface normal vector.
+     * - The third 3 floats are the vertex's RGB color information.
      *
      * Every 3 vertices create a triangle.
      */
 
     this->vertexCount = this->triangleCount * VERTICES_PER_TRIANGLE;
-    this->vertexDataSize = this->vertexCount * (VERTEX_SIZE + NORMAL_SIZE);
+    this->vertexDataSize = this->vertexCount * (VERTEX_SIZE + NORMAL_SIZE + COLOR_SIZE);
     this->vertexData = (float*)(malloc(this->vertexDataSize));
 
     // Filling position vector information.
@@ -49,7 +50,7 @@ Model::Model (const char* modelPath)
         stream >> this->vertexData[vertexIdx + 2];
     }
 
-    // Filling normal vector information.
+    // Filling surface normal vector information.
 
     for (int i = 0; i < this->triangleCount; ++i)
     {
@@ -84,6 +85,16 @@ Model::Model (const char* modelPath)
             this->vertexData[vertexIdx + 5] = normal.z;
         }
     }
+
+    // Filling color information.
+
+    for (int i = 0; i < this->vertexCount; ++i)
+    {
+        const unsigned int vertexIdx = i * VERTEX_DATA_STRIDE;
+        this->vertexData[vertexIdx + 6] = this->color.x;
+        this->vertexData[vertexIdx + 7] = this->color.y;
+        this->vertexData[vertexIdx + 8] = this->color.z;
+    }
 }
 
 Model::~Model ()
@@ -109,6 +120,11 @@ const size_t Model::getVertexDataSize () const
 const float* const Model::getVertexData () const
 {
     return this->vertexData;
+}
+
+const glm::vec3 Model::getColor () const
+{
+    return this->color;
 }
 
 std::ostream& operator<<(std::ostream& os, const Model& model)

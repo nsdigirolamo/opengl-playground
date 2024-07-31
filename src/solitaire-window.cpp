@@ -64,7 +64,7 @@ int main ()
 
     Shader shader { "shaders/shader.vs", "shaders/shader.fs" };
 
-    Model model { "models/teapot_bezier0.tris" };
+    Model model { "models/teapot_bezier0.tris", glm::vec3(0.0, 1.0, 0.0) };
 
     unsigned int vertexArray, vertexBuffer;
 
@@ -81,6 +81,9 @@ int main ()
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     Camera camera;
 
