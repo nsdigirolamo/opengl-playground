@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "shader.hpp"
 #include "model.hpp"
+#include "light.hpp"
 
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -63,27 +64,10 @@ int main ()
     glEnable(GL_DEPTH_TEST);
 
     Shader shader { "shaders/shader.vs", "shaders/shader.fs" };
+    Shader lightShader { "shaders/lights.vs", "shaders/lights.fs" };
 
-    Model model { "models/teapot_bezier0.tris", glm::vec3(0.0, 1.0, 0.0) };
-
-    unsigned int vertexArray, vertexBuffer;
-
-    glGenVertexArrays(1, &vertexArray);
-    glGenBuffers(1, &vertexBuffer);
-
-    glBindVertexArray(vertexArray);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, model.getVertexDataSize(), model.getVertexData(), GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(0));
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    Model model { "models/teapot_bezier0.tris", glm::vec3(1.0, 0.5, 0.31) };
+    Light light { };
 
     Camera camera;
 
@@ -121,8 +105,13 @@ int main ()
         shader.setMat4("view", viewMat);
         shader.setMat4("model", modelMat);
 
-        glBindVertexArray(vertexArray);
-        glDrawArrays(GL_TRIANGLES, 0, model.getVertexCount());
+        model.bindVertexBuffer();
+        model.bindVertexArray();
+        model.drawVertexArray();
+
+        light.bindVertexBuffer();
+        light.bindVertexArray();
+        light.drawVertexArray();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

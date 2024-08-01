@@ -23,12 +23,23 @@ class Model
         size_t vertexDataSize;
         float* vertexData;
 
+        unsigned int vertexArray;
+        unsigned int vertexBuffer;
+
         glm::vec3 color;
+
+        void fillVertexPositions (std::stringstream& vertexPositions);
+        void fillVertexSurfaceNormals ();
+        void fillVertexColors ();
 
     public:
 
         Model (const char* modelPath, glm::vec3 color);
         ~Model ();
+
+        void bindVertexArray () const;
+        void bindVertexBuffer () const;
+        void drawVertexArray () const;
 
         const unsigned int getTriangleCount () const;
         const unsigned int getVertexCount () const;

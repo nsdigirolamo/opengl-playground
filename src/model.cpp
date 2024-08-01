@@ -1,57 +1,24 @@
 #include "model.hpp"
 #include "glm/glm.hpp"
+#include "glad/glad.h"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
-Model::Model (const char* modelPath, glm::vec3 color)
+void Model::fillVertexPositions (std::stringstream& vertexPositions)
 {
-    std::ifstream file;
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-    std::stringstream stream;
-
-    try
-    {
-        file.open(modelPath);
-        stream << file.rdbuf();
-        file.close();
-    }
-    catch(const std::ifstream::failure &e)
-    {
-        std::cerr << "Model '" << modelPath << "' File Read Error: " << e.what() << std::endl;
-        exit(-1);
-    }
-
-    stream >> this->triangleCount;
-    this->color = color;
-
-    /**
-     * An element of the vertex data consists of 9 floats.
-     * - The first 3 floats are the vertex's 3D position vector.
-     * - The second 3 floats are the vertex's 3D surface normal vector.
-     * - The third 3 floats are the vertex's RGB color information.
-     *
-     * Every 3 vertices create a triangle.
-     */
-
-    this->vertexCount = this->triangleCount * VERTICES_PER_TRIANGLE;
-    this->vertexDataSize = this->vertexCount * (VERTEX_SIZE + NORMAL_SIZE + COLOR_SIZE);
-    this->vertexData = (float*)(malloc(this->vertexDataSize));
-
-    // Filling position vector information.
-
     for (int i = 0; i < this->vertexCount; ++i)
     {
         const unsigned int vertexIdx = i * VERTEX_DATA_STRIDE;
-        stream >> this->vertexData[vertexIdx];
-        stream >> this->vertexData[vertexIdx + 1];
-        stream >> this->vertexData[vertexIdx + 2];
+        vertexPositions >> this->vertexData[vertexIdx];
+        vertexPositions >> this->vertexData[vertexIdx + 1];
+        vertexPositions >> this->vertexData[vertexIdx + 2];
     }
+}
 
-    // Filling surface normal vector information.
-
+void Model::fillVertexSurfaceNormals ()
+{
     for (int i = 0; i < this->triangleCount; ++i)
     {
         const int triangleIdx = i * VERTEX_DATA_STRIDE * VERTICES_PER_TRIANGLE;
@@ -85,9 +52,10 @@ Model::Model (const char* modelPath, glm::vec3 color)
             this->vertexData[vertexIdx + 5] = normal.z;
         }
     }
+}
 
-    // Filling color information.
-
+void Model::fillVertexColors ()
+{
     for (int i = 0; i < this->vertexCount; ++i)
     {
         const unsigned int vertexIdx = i * VERTEX_DATA_STRIDE;
@@ -97,9 +65,81 @@ Model::Model (const char* modelPath, glm::vec3 color)
     }
 }
 
+Model::Model (const char* modelPath, glm::vec3 color)
+    : color(color)
+{
+    std::ifstream file;
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    std::stringstream modelData;
+
+    try
+    {
+        file.open(modelPath);
+        modelData << file.rdbuf();
+        file.close();
+    }
+    catch(const std::ifstream::failure &e)
+    {
+        std::cerr << "Model '" << modelPath << "' File Read Error: " << e.what() << std::endl;
+        exit(-1);
+    }
+
+    modelData >> this->triangleCount;
+
+    /**
+     * An element of the vertex data consists of 9 floats.
+     * - The first 3 floats are the vertex's 3D position vector.
+     * - The second 3 floats are the vertex's 3D surface normal vector.
+     * - The third 3 floats are the vertex's RGB color information.
+     *
+     * Every 3 vertices create a triangle.
+     */
+
+    this->vertexCount = this->triangleCount * VERTICES_PER_TRIANGLE;
+    this->vertexDataSize = this->vertexCount * (VERTEX_SIZE + NORMAL_SIZE + COLOR_SIZE);
+    this->vertexData = (float*)(malloc(this->vertexDataSize));
+
+    this->fillVertexPositions(modelData);
+    this->fillVertexSurfaceNormals();
+    this->fillVertexColors();
+
+    glGenVertexArrays(1, &(this->vertexArray));
+    glBindVertexArray(this->vertexArray);
+
+    glGenBuffers(1, &(this->vertexBuffer));
+    glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
+
+    glBufferData(GL_ARRAY_BUFFER, this->vertexDataSize, this->vertexData, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(0));
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+}
+
 Model::~Model ()
 {
     free(this->vertexData);
+}
+
+void Model::bindVertexArray () const
+{
+    glBindVertexArray(this->vertexArray);
+}
+
+void Model::bindVertexBuffer () const
+{
+    glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
+}
+
+void Model::drawVertexArray () const
+{
+    glDrawArrays(GL_TRIANGLES, 0, this->vertexCount);
 }
 
 const unsigned int Model::getTriangleCount () const
