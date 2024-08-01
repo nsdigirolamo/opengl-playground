@@ -64,7 +64,6 @@ int main ()
     glEnable(GL_DEPTH_TEST);
 
     Shader shader { "shaders/shader.vs", "shaders/shader.fs" };
-    Shader lightShader { "shaders/lights.vs", "shaders/lights.fs" };
 
     Model model { "models/teapot_bezier0.tris", glm::vec3(1.0, 0.5, 0.31) };
     Light light { };
