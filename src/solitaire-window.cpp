@@ -99,11 +99,15 @@ int main ()
 
         glm::mat4 modelMat = glm::mat4(1.0f);
 
+        glm::mat4 translateMat = glm::mat4(1.0f);
+        translateMat = glm::translate(translateMat, glm::vec3(0.0, 1.0, 0.0));
+
         nonLightShader.use();
 
         nonLightShader.setMat4("projection", projectionMat);
         nonLightShader.setMat4("view", viewMat);
         nonLightShader.setMat4("model", modelMat);
+        nonLightShader.setMat4("translate", translateMat);
 
         model.bindVertexBuffer();
         model.bindVertexArray();
@@ -111,9 +115,13 @@ int main ()
 
         lightShader.use();
 
+        translateMat = glm::mat4(1.0f);
+        translateMat = glm::translate(translateMat, glm::vec3(0.0, 1.0, 0.0));
+
         lightShader.setMat4("projection", projectionMat);
         lightShader.setMat4("view", viewMat);
         lightShader.setMat4("model", modelMat);
+        nonLightShader.setMat4("translate", translateMat);
 
         light.bindVertexBuffer();
         light.bindVertexArray();

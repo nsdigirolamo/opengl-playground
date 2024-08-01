@@ -9,10 +9,11 @@ out vec3 vertexColor;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 translate;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(posAttribute, 1.0f);
+	gl_Position = projection * view * model * translate * vec4(posAttribute, 1.0f);
 	vertexNormal = normalAttribute;
 	vertexColor = colorAttribute;
 }
