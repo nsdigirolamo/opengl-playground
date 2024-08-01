@@ -63,7 +63,8 @@ int main ()
 
     glEnable(GL_DEPTH_TEST);
 
-    Shader shader { "shaders/shader.vs", "shaders/shader.fs" };
+    Shader nonLightShader { "shaders/nonlight.vert.glsl", "shaders/nonlight.frag.glsl" };
+    Shader lightShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
 
     Model model { "models/teapot_bezier0.tris", glm::vec3(1.0, 0.5, 0.31) };
     Light light { };
@@ -84,10 +85,8 @@ int main ()
         glfwGetCursorPos(window, &xCursorPos, &yCursorPos);
         camera.processMouseInput(glm::vec2(xCursorPos, yCursorPos));
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.use();
 
         glm::mat4 projectionMat = glm::perspective(
             glm::radians(camera.fov),
@@ -100,13 +99,21 @@ int main ()
 
         glm::mat4 modelMat = glm::mat4(1.0f);
 
-        shader.setMat4("projection", projectionMat);
-        shader.setMat4("view", viewMat);
-        shader.setMat4("model", modelMat);
+        nonLightShader.use();
+
+        nonLightShader.setMat4("projection", projectionMat);
+        nonLightShader.setMat4("view", viewMat);
+        nonLightShader.setMat4("model", modelMat);
 
         model.bindVertexBuffer();
         model.bindVertexArray();
         model.drawVertexArray();
+
+        lightShader.use();
+
+        lightShader.setMat4("projection", projectionMat);
+        lightShader.setMat4("view", viewMat);
+        lightShader.setMat4("model", modelMat);
 
         light.bindVertexBuffer();
         light.bindVertexArray();
