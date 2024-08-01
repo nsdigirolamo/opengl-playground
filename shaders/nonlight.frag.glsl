@@ -6,5 +6,6 @@ in vec3 color;
 
 void main()
 {
-	fColor = vec4(color, 1.0);
+	float ambientStrength = 0.1;
+	fColor = vec4(color * ambientStrength, 1.0);
 }
