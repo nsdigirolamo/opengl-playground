@@ -67,7 +67,9 @@ int main ()
     Shader lightShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
 
     Model model { "models/teapot_bezier0.tris", glm::vec3(1.0, 0.5, 0.31) };
+
     Light light { };
+    light.position = glm::vec3(2.0f, 2.0f, 2.0f);
 
     Camera camera;
 
@@ -100,7 +102,7 @@ int main ()
         glm::mat4 modelMat = glm::mat4(1.0f);
 
         glm::mat4 translateMat = glm::mat4(1.0f);
-        translateMat = glm::translate(translateMat, glm::vec3(0.0, 1.0, 0.0));
+        translateMat = glm::translate(translateMat, model.position);
 
         nonLightShader.use();
 
@@ -108,6 +110,8 @@ int main ()
         nonLightShader.setMat4("view", viewMat);
         nonLightShader.setMat4("model", modelMat);
         nonLightShader.setMat4("translate", translateMat);
+        nonLightShader.setVec3("lightColor", light.getColor());
+        nonLightShader.setVec3("lightPosition", light.position);
 
         model.bindVertexBuffer();
         model.bindVertexArray();
@@ -116,12 +120,12 @@ int main ()
         lightShader.use();
 
         translateMat = glm::mat4(1.0f);
-        translateMat = glm::translate(translateMat, glm::vec3(0.0, 1.0, 0.0));
+        translateMat = glm::translate(translateMat, light.position);
 
         lightShader.setMat4("projection", projectionMat);
         lightShader.setMat4("view", viewMat);
         lightShader.setMat4("model", modelMat);
-        nonLightShader.setMat4("translate", translateMat);
+        lightShader.setMat4("translate", translateMat);
 
         light.bindVertexBuffer();
         light.bindVertexArray();
