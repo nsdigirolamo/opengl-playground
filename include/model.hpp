@@ -34,6 +34,8 @@ class Model
 
     public:
 
+        glm::vec3 position;
+
         Model (const char* modelPath, glm::vec3 color);
         ~Model ();
 
