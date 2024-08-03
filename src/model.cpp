@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 void Model::fillVertexPositions (std::stringstream& vertexPositions)
 {
@@ -19,37 +20,33 @@ void Model::fillVertexPositions (std::stringstream& vertexPositions)
 
 void Model::fillVertexSurfaceNormals ()
 {
-    for (int i = 0; i < this->triangleCount; ++i)
+    for (int i = 0; i < this->vertexCount; i = i + VERTICES_PER_TRIANGLE)
     {
-        const int triangleIdx = i * VERTEX_DATA_STRIDE * VERTICES_PER_TRIANGLE;
-
-        const glm::vec3 vertex0 = glm::vec3(
-            this->vertexData[triangleIdx],
-            this->vertexData[triangleIdx + 1],
-            this->vertexData[triangleIdx + 2]
-        );
-
-        const glm::vec3 vertex1 = glm::vec3(
-            this->vertexData[triangleIdx + 6],
-            this->vertexData[triangleIdx + 7],
-            this->vertexData[triangleIdx + 8]
-        );
-
-        const glm::vec3 vertex2 = glm::vec3(
-            this->vertexData[triangleIdx + 12],
-            this->vertexData[triangleIdx + 13],
-            this->vertexData[triangleIdx + 14]
-        );
-
-        const glm::vec3 normal = glm::normalize(glm::cross(vertex1 - vertex0, vertex2 - vertex0));
+        glm::vec3 vertices [3];
 
         for (int j = 0; j < VERTICES_PER_TRIANGLE; ++j)
         {
-            const int vertexIdx = triangleIdx + (j * VERTEX_DATA_STRIDE);
+            const unsigned int vertexIdx = (i + j) * VERTEX_DATA_STRIDE;
+            vertices[j] = glm::vec3(
+                this->vertexData[vertexIdx],
+                this->vertexData[vertexIdx + 1],
+                this->vertexData[vertexIdx + 2]
+            );
+        }
 
-            this->vertexData[vertexIdx + 3] = normal.x;
-            this->vertexData[vertexIdx + 4] = normal.y;
-            this->vertexData[vertexIdx + 5] = normal.z;
+        const glm::vec3 surfaceNormal = glm::normalize(
+            glm::cross(
+                vertices[1] - vertices[0],
+                vertices[2] - vertices[0]
+            )
+        );
+
+        for (int j = 0; j < VERTICES_PER_TRIANGLE; ++j)
+        {
+            const unsigned int vertexIdx = (i + j) * VERTEX_DATA_STRIDE;
+            this->vertexData[vertexIdx + 3] = surfaceNormal.x;
+            this->vertexData[vertexIdx + 4] = surfaceNormal.y;
+            this->vertexData[vertexIdx + 5] = surfaceNormal.z;
         }
     }
 }
@@ -67,6 +64,7 @@ void Model::fillVertexColors ()
 
 Model::Model (const char* modelPath, glm::vec3 color)
     : color(color)
+    , position(glm::vec3(0.0f, 0.0f, 0.0f))
 {
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -175,13 +173,28 @@ std::ostream& operator<<(std::ostream& os, const Model& model)
     {
         const int vertexIdx = i * VERTEX_DATA_STRIDE;
 
-        os << vertices[vertexIdx] << " " << vertices[vertexIdx + 1] << " " << vertices[vertexIdx + 2];
-        os << ", ";
-        os << vertices[vertexIdx + 3] << " " << vertices[vertexIdx + 4] << " " << vertices[vertexIdx + 5];
-        os << std::endl;
+        for (int j = 0; j < VERTEX_DATA_STRIDE; ++j)
+        {
+            if (j % 3 == 0)
+            {
+                os << "[ ";
+            }
+
+            os << std::setw(10) << std::fixed << std::setprecision(7) << vertices[vertexIdx + j] << " ";
+
+            if (j % 3 == 2)
+            {
+                os << "], ";
+            }
+
+            if (j == VERTEX_DATA_STRIDE - 1)
+            {
+                os << "\n";
+            }
+        }
     }
 
-    os << model.getTriangleCount() << " " << model.getVertexCount() << " " << model.getVertexDataSize();
+    os << model.getTriangleCount() << " " << model.getVertexCount() << " " << model.getVertexDataSize() << std::endl;
 
     return os;
 }
