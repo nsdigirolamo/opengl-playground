@@ -16,6 +16,6 @@ void main()
 {
 	vertexPosition = vec3(model * vec4(positionAttribute, 1.0));
 	gl_Position = projection * view * translate * vec4(vertexPosition, 1.0);
-	vertexSurfaceNormal = surfaceNormalAttribute;
+	vertexSurfaceNormal = mat3(transpose(inverse(model))) * surfaceNormalAttribute;
 	vertexColor = colorAttribute;
 }
