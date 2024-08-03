@@ -9,8 +9,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-constexpr unsigned int WINDOW_WIDTH = 960;
-constexpr unsigned int WINDOW_HEIGHT = 540;
+constexpr unsigned int WINDOW_WIDTH = 1600;
+constexpr unsigned int WINDOW_HEIGHT = 800;
 
 void errorCallback (int error, const char* description)
 {
@@ -66,7 +66,7 @@ int main ()
     Shader nonLightShader { "shaders/nonlight.vert.glsl", "shaders/nonlight.frag.glsl" };
     Shader lightShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
 
-    Model model { "models/teapot_bezier0.tris", glm::vec3(1.0, 0.5, 0.31) };
+    Model model { "models/teapot_bezier2.tris", glm::vec3(1.0, 0.5, 0.31) };
 
     Light light { };
     light.position = glm::vec3(2.0f, 2.0f, 2.0f);
