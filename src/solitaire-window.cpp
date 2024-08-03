@@ -69,7 +69,7 @@ int main ()
     Model model { "models/teapot_bezier2.tris", glm::vec3(1.0, 0.5, 0.31) };
 
     Light light { };
-    light.position = glm::vec3(2.0f, 2.0f, 2.0f);
+    light.position = glm::vec3(0.0f, 2.0f, 0.0f);
 
     Camera camera;
 
@@ -118,6 +118,9 @@ int main ()
         model.drawVertexArray();
 
         lightShader.use();
+
+        light.position.x = 5 * sin(currentTime);
+        light.position.z = 5 * cos(currentTime);
 
         translateMat = glm::mat4(1.0f);
         translateMat = glm::translate(translateMat, light.position);
