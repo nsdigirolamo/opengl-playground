@@ -69,7 +69,7 @@ int main ()
     Model model { "models/teapot_bezier2.tris", glm::vec3(1.0, 0.5, 0.31) };
 
     Light light { };
-    light.position = glm::vec3(0.0f, 2.0f, 0.0f);
+    light.position = glm::vec3(2.0f, 2.0f, 2.0f);
 
     Camera camera;
 
@@ -106,12 +106,15 @@ int main ()
 
         nonLightShader.use();
 
+        nonLightShader.setVec3("objectColor", model.getColor());
+        nonLightShader.setVec3("lightColor", light.getColor());
+        nonLightShader.setVec3("lightPosition", light.position);
+        nonLightShader.setVec3("viewPosition", camera.position);
+
         nonLightShader.setMat4("projection", projectionMat);
         nonLightShader.setMat4("view", viewMat);
         nonLightShader.setMat4("model", modelMat);
         nonLightShader.setMat4("translate", translateMat);
-        nonLightShader.setVec3("lightColor", light.getColor());
-        nonLightShader.setVec3("lightPosition", light.position);
 
         model.bindVertexBuffer();
         model.bindVertexArray();
@@ -124,6 +127,8 @@ int main ()
 
         translateMat = glm::mat4(1.0f);
         translateMat = glm::translate(translateMat, light.position);
+
+        lightShader.setVec3("lightColor", light.getColor());
 
         lightShader.setMat4("projection", projectionMat);
         lightShader.setMat4("view", viewMat);
