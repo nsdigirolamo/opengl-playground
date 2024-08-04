@@ -3,11 +3,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "camera.hpp"
 #include "shader.hpp"
-#include "model.hpp"
-#include "light.hpp"
 
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <model.hpp>
 
 constexpr unsigned int WINDOW_WIDTH = 1600;
 constexpr unsigned int WINDOW_HEIGHT = 800;
@@ -66,10 +65,19 @@ int main ()
     Shader nonLightShader { "shaders/nonlight.vert.glsl", "shaders/nonlight.frag.glsl" };
     Shader lightShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
 
-    Model model { "models/cube.obj", glm::vec3(1.0, 0.5, 0.31) };
+    Model object {
+        "models/cube.obj",
+        glm::vec3(0.0f),
+        glm::vec3(1.0, 0.5, 0.31),
+        glm::vec3(1.0f)
+    };
 
-    Light light { };
-    light.position = glm::vec3(2.0f, 2.0f, 2.0f);
+    Model light {
+        "models/cube.obj",
+        glm::vec3(0.0f),
+        glm::vec3(1.0f),
+        glm::vec3(0.2f)
+    };
 
     Camera camera;
 
@@ -102,11 +110,14 @@ int main ()
         glm::mat4 modelMat = glm::mat4(1.0f);
 
         glm::mat4 translateMat = glm::mat4(1.0f);
-        translateMat = glm::translate(translateMat, model.position);
+        translateMat = glm::translate(translateMat, object.position);
+
+        glm::mat4 scaleMat = glm::mat4(1.0f);
+        scaleMat = glm::scale(scaleMat, object.scale);
 
         nonLightShader.use();
 
-        nonLightShader.setVec3("objectColor", model.color);
+        nonLightShader.setVec3("objectColor", object.color);
         nonLightShader.setVec3("lightColor", light.color);
         nonLightShader.setVec3("lightPosition", light.position);
         nonLightShader.setVec3("viewPosition", camera.position);
@@ -115,10 +126,11 @@ int main ()
         nonLightShader.setMat4("view", viewMat);
         nonLightShader.setMat4("model", modelMat);
         nonLightShader.setMat4("translate", translateMat);
+        nonLightShader.setMat4("scale", scaleMat);
 
-        model.bindVertexBuffer();
-        model.bindVertexArray();
-        model.drawVertexArray();
+        object.bindVertexBuffer();
+        object.bindVertexArray();
+        object.drawVertexArray();
 
         lightShader.use();
 
@@ -128,12 +140,16 @@ int main ()
         translateMat = glm::mat4(1.0f);
         translateMat = glm::translate(translateMat, light.position);
 
+        scaleMat = glm::mat4(1.0f);
+        scaleMat = glm::scale(scaleMat, light.scale);
+
         lightShader.setVec3("lightColor", light.color);
 
         lightShader.setMat4("projection", projectionMat);
         lightShader.setMat4("view", viewMat);
         lightShader.setMat4("model", modelMat);
         lightShader.setMat4("translate", translateMat);
+        lightShader.setMat4("scale", scaleMat);
 
         light.bindVertexBuffer();
         light.bindVertexArray();
