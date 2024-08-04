@@ -7,87 +7,120 @@
 #include <sstream>
 #include <iomanip>
 
-void Model::fillVertexPositions (std::stringstream& vertexPositions)
+void Model::constructFromObj (const char* filePath)
 {
-    for (int i = 0; i < this->vertexCount; ++i)
+    std::ifstream file;
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    std::stringstream objDataStream;
+
+    try
     {
-        const unsigned int vertexIdx = i * VERTEX_DATA_STRIDE;
-        vertexPositions >> this->vertexData[vertexIdx];
-        vertexPositions >> this->vertexData[vertexIdx + 1];
-        vertexPositions >> this->vertexData[vertexIdx + 2];
+        file.open(filePath);
+        objDataStream << file.rdbuf();
+        file.close();
     }
-}
-
-void Model::fillVertexSurfaceNormals ()
-{
-    for (int i = 0; i < this->vertexCount; i = i + VERTICES_PER_TRIANGLE)
+    catch(const std::ifstream::failure &e)
     {
-        glm::vec3 vertices [3];
+        std::cerr << "File Read Error for '" << filePath << "': " << e.what() << std::endl;
+        exit(-1);
+    }
 
-        for (int j = 0; j < VERTICES_PER_TRIANGLE; ++j)
+    unsigned int vertexCount = 0;
+    unsigned int surfaceNormalCount  = 0;
+    unsigned int faceCount = 0;
+
+    std::stringstream vertexStream;
+    std::stringstream surfaceNormalStream;
+    std::stringstream faceStream;
+
+    std::string line;
+
+    while (std::getline(objDataStream, line))
+    {
+        if (line[0] == 'v' && line[1] == 'n' && line[2] == ' ')
         {
-            const unsigned int vertexIdx = (i + j) * VERTEX_DATA_STRIDE;
-            vertices[j] = glm::vec3(
-                this->vertexData[vertexIdx],
-                this->vertexData[vertexIdx + 1],
-                this->vertexData[vertexIdx + 2]
-            );
+            surfaceNormalStream << line << "\n";
+            ++surfaceNormalCount;
         }
-
-        const glm::vec3 surfaceNormal = glm::normalize(
-            glm::cross(
-                vertices[1] - vertices[0],
-                vertices[2] - vertices[0]
-            )
-        );
-
-        for (int j = 0; j < VERTICES_PER_TRIANGLE; ++j)
+        else if (line[0] == 'v' && line[1] == ' ')
         {
-            const unsigned int vertexIdx = (i + j) * VERTEX_DATA_STRIDE;
-            this->vertexData[vertexIdx + 3] = surfaceNormal.x;
-            this->vertexData[vertexIdx + 4] = surfaceNormal.y;
-            this->vertexData[vertexIdx + 5] = surfaceNormal.z;
+            vertexStream << line << "\n";
+            ++vertexCount;
+        }
+        else if (line[0] == 'f' && line[1] == ' ')
+        {
+            faceStream << line << "\n";
+            ++faceCount;
         }
     }
+
+    glm::vec3* vertices = (glm::vec3*) malloc(vertexCount * sizeof(glm::vec3));
+    glm::vec3* surfaceNormals = (glm::vec3*) malloc(surfaceNormalCount * sizeof(glm::vec3));
+
+    for (int i = 0; i < vertexCount; ++i)
+    {
+        std::string throwAwayID;
+        vertexStream >> throwAwayID;
+        vertexStream >> vertices[i].x;
+        vertexStream >> vertices[i].y;
+        vertexStream >> vertices[i].z;
+    }
+
+    for (int i = 0; i < surfaceNormalCount; ++i)
+    {
+        std::string throwAwayID;
+        surfaceNormalStream >> throwAwayID;
+        surfaceNormalStream >> surfaceNormals[i].x;
+        surfaceNormalStream >> surfaceNormals[i].y;
+        surfaceNormalStream >> surfaceNormals[i].z;
+    }
+
+    this->vertexDataCount = faceCount * VERTICES_PER_FACE;
+    this->vertexDataSize = this->vertexDataCount * (VERTEX_SIZE + SURFACE_NORMAL_SIZE);
+    this->vertexData = (float*) malloc(this->vertexDataSize);
+
+    for (int i = 0; i < faceCount; ++i) {
+
+        std::string throwAwayID;
+        std::string faceVertex;
+
+        faceStream >> throwAwayID;
+
+        for (int j = 0; j < 3; ++j)
+        {
+            int vertexDataIndex = VERTEX_DATA_STRIDE * ((i * VERTICES_PER_FACE) + j);
+
+            faceStream >> faceVertex;
+
+            int delimiterPosition;
+            int vertexIndex;
+            int surfaceNormalIndex;
+
+            delimiterPosition = faceVertex.find("//");
+
+            vertexIndex = std::stoi(faceVertex.substr(0, delimiterPosition)) - 1;
+            surfaceNormalIndex = std::stoi(faceVertex.substr(delimiterPosition + 2)) - 1;
+
+            this->vertexData[vertexDataIndex] = vertices[vertexIndex].x;
+            this->vertexData[vertexDataIndex + 1] = vertices[vertexIndex].y;
+            this->vertexData[vertexDataIndex + 2] = vertices[vertexIndex].z;
+
+            this->vertexData[vertexDataIndex + 3] = surfaceNormals[surfaceNormalIndex].x;
+            this->vertexData[vertexDataIndex + 4] = surfaceNormals[surfaceNormalIndex].y;
+            this->vertexData[vertexDataIndex + 5] = surfaceNormals[surfaceNormalIndex].z;
+        }
+    }
+
+    free(vertices);
+    free(surfaceNormals);
 }
 
 Model::Model (const char* modelPath, glm::vec3 color)
     : color(color)
     , position(glm::vec3(0.0f, 0.0f, 0.0f))
 {
-    std::ifstream file;
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-    std::stringstream modelData;
-
-    try
-    {
-        file.open(modelPath);
-        modelData << file.rdbuf();
-        file.close();
-    }
-    catch(const std::ifstream::failure &e)
-    {
-        std::cerr << "Model '" << modelPath << "' File Read Error: " << e.what() << std::endl;
-        exit(-1);
-    }
-
-    modelData >> this->triangleCount;
-
-    /**
-     * An element of the vertex data consists of 9 floats.
-     * - The first 3 floats are the vertex's 3D position vector.
-     * - The second 3 floats are the vertex's 3D surface normal vector.
-     *
-     * Every 3 vertices create a triangle.
-     */
-
-    this->vertexCount = this->triangleCount * VERTICES_PER_TRIANGLE;
-    this->vertexDataSize = this->vertexCount * (VERTEX_SIZE + NORMAL_SIZE);
-    this->vertexData = (float*)(malloc(this->vertexDataSize));
-
-    this->fillVertexPositions(modelData);
-    this->fillVertexSurfaceNormals();
+    this->constructFromObj(modelPath);
 
     glGenVertexArrays(1, &(this->vertexArray));
     glBindVertexArray(this->vertexArray);
@@ -102,14 +135,26 @@ Model::Model (const char* modelPath, glm::vec3 color)
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(6 * sizeof(float)));
-    //glEnableVertexAttribArray(2);
 }
 
 Model::~Model ()
 {
     free(this->vertexData);
+}
+
+const size_t Model::getVertexDataSize () const
+{
+    return this->vertexDataSize;
+}
+
+const float* const Model::getVertexData () const
+{
+    return this->vertexData;
+}
+
+const unsigned int Model::getVertexDataCount () const
+{
+    return this->vertexDataCount;
 }
 
 void Model::bindVertexArray () const
@@ -124,39 +169,14 @@ void Model::bindVertexBuffer () const
 
 void Model::drawVertexArray () const
 {
-    glDrawArrays(GL_TRIANGLES, 0, this->vertexCount);
-}
-
-const unsigned int Model::getTriangleCount () const
-{
-    return this->triangleCount;
-}
-
-const unsigned int Model::getVertexCount () const
-{
-    return this->vertexCount;
-}
-
-const size_t Model::getVertexDataSize () const
-{
-    return this->vertexDataSize;
-}
-
-const float* const Model::getVertexData () const
-{
-    return this->vertexData;
-}
-
-const glm::vec3 Model::getColor () const
-{
-    return this->color;
+    glDrawArrays(GL_TRIANGLES, 0, this->vertexDataCount);
 }
 
 std::ostream& operator<<(std::ostream& os, const Model& model)
 {
     const float* const vertices = model.getVertexData();
 
-    for (int i = 0; i < model.getVertexCount(); ++i)
+    for (int i = 0; i < model.getVertexDataCount(); ++i)
     {
         const int vertexIdx = i * VERTEX_DATA_STRIDE;
 
@@ -181,7 +201,7 @@ std::ostream& operator<<(std::ostream& os, const Model& model)
         }
     }
 
-    os << model.getTriangleCount() << " " << model.getVertexCount() << " " << model.getVertexDataSize() << std::endl;
+    os << model.getVertexDataCount() << " " << model.getVertexDataSize() << std::endl;
 
     return os;
 }

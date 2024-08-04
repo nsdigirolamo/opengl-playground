@@ -6,9 +6,9 @@
 #include <stddef.h>
 #include <ostream>
 
-#define VERTICES_PER_TRIANGLE 3
+#define VERTICES_PER_FACE 3
 #define VERTEX_SIZE sizeof(float) * 3
-#define NORMAL_SIZE sizeof(float) * 3
+#define SURFACE_NORMAL_SIZE sizeof(float) * 3
 
 #define VERTEX_DATA_STRIDE 6
 
@@ -16,38 +16,30 @@ class Model
 {
     private:
 
-        unsigned int triangleCount;
-        unsigned int vertexCount;
-
-        size_t vertexDataSize;
         float* vertexData;
+        size_t vertexDataSize;
+        unsigned int vertexDataCount;
 
         unsigned int vertexArray;
         unsigned int vertexBuffer;
 
-        glm::vec3 color;
-
-        void fillVertexPositions (std::stringstream& vertexPositions);
-        void fillVertexSurfaceNormals ();
-        void fillVertexColors ();
+        void constructFromObj (const char* filePath);
 
     public:
 
         glm::vec3 position;
+        glm::vec3 color;
 
         Model (const char* modelPath, glm::vec3 color);
         ~Model ();
 
+        const size_t getVertexDataSize () const;
+        const float* const getVertexData () const;
+        const unsigned int getVertexDataCount () const;
+
         void bindVertexArray () const;
         void bindVertexBuffer () const;
         void drawVertexArray () const;
-
-        const unsigned int getTriangleCount () const;
-        const unsigned int getVertexCount () const;
-
-        const size_t getVertexDataSize () const;
-        const float* const getVertexData () const;
-        const glm::vec3 getColor () const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Model& data);
