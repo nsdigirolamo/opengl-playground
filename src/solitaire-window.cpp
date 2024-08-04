@@ -66,7 +66,7 @@ int main ()
     Shader nonLightShader { "shaders/nonlight.vert.glsl", "shaders/nonlight.frag.glsl" };
     Shader lightShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
 
-    Model model { "models/teapot_bezier2.tris", glm::vec3(1.0, 0.5, 0.31) };
+    Model model { "models/cube.obj", glm::vec3(1.0, 0.5, 0.31) };
 
     Light light { };
     light.position = glm::vec3(2.0f, 2.0f, 2.0f);
@@ -106,8 +106,8 @@ int main ()
 
         nonLightShader.use();
 
-        nonLightShader.setVec3("objectColor", model.getColor());
-        nonLightShader.setVec3("lightColor", light.getColor());
+        nonLightShader.setVec3("objectColor", model.color);
+        nonLightShader.setVec3("lightColor", light.color);
         nonLightShader.setVec3("lightPosition", light.position);
         nonLightShader.setVec3("viewPosition", camera.position);
 
@@ -128,7 +128,7 @@ int main ()
         translateMat = glm::mat4(1.0f);
         translateMat = glm::translate(translateMat, light.position);
 
-        lightShader.setVec3("lightColor", light.getColor());
+        lightShader.setVec3("lightColor", light.color);
 
         lightShader.setMat4("projection", projectionMat);
         lightShader.setMat4("view", viewMat);
