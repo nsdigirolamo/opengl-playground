@@ -116,11 +116,16 @@ void Model::constructFromObj (const char* filePath)
     free(surfaceNormals);
 }
 
-Model::Model (const char* modelPath, glm::vec3 color)
-    : color(color)
-    , position(glm::vec3(0.0f, 0.0f, 0.0f))
+Model::Model (const char* objFilePath)
+    : Model(objFilePath, glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(1.0f))
+{ }
+
+Model::Model (const char* objFilePath, glm::vec3 position, glm::vec3 color, glm::vec3 scale)
+    : position(position)
+    , color(color)
+    , scale(scale)
 {
-    this->constructFromObj(modelPath);
+    this->constructFromObj(objFilePath);
 
     glGenVertexArrays(1, &(this->vertexArray));
     glBindVertexArray(this->vertexArray);
