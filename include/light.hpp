@@ -8,7 +8,7 @@ class Light : public Model
     public:
 
         Light ()
-            : Model("models/small_box.tris", glm::vec3(1.0, 1.0, 1.0))
+            : Model("models/cube.obj", glm::vec3(1.0, 1.0, 1.0))
         { }
 };
 
