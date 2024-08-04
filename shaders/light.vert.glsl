@@ -1,10 +1,6 @@
 #version 330 core
-layout (location = 0) in vec3 posAttribute;
-layout (location = 1) in vec3 normalAttribute;
-layout (location = 2) in vec3 colorAttribute;
-
-out vec3 vertexNormal;
-out vec3 vertexColor;
+layout (location = 0) in vec3 positionAttribute;
+layout (location = 1) in vec3 surfaceNormalAttribute;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -13,7 +9,5 @@ uniform mat4 translate;
 
 void main()
 {
-	gl_Position = projection * view * model * translate * vec4(posAttribute, 1.0f);
-	vertexNormal = normalAttribute;
-	vertexColor = colorAttribute;
+	gl_Position = projection * view * translate * model * vec4(positionAttribute, 1.0);
 }
