@@ -51,17 +51,6 @@ void Model::fillVertexSurfaceNormals ()
     }
 }
 
-void Model::fillVertexColors ()
-{
-    for (int i = 0; i < this->vertexCount; ++i)
-    {
-        const unsigned int vertexIdx = i * VERTEX_DATA_STRIDE;
-        this->vertexData[vertexIdx + 6] = this->color.x;
-        this->vertexData[vertexIdx + 7] = this->color.y;
-        this->vertexData[vertexIdx + 8] = this->color.z;
-    }
-}
-
 Model::Model (const char* modelPath, glm::vec3 color)
     : color(color)
     , position(glm::vec3(0.0f, 0.0f, 0.0f))
@@ -89,18 +78,16 @@ Model::Model (const char* modelPath, glm::vec3 color)
      * An element of the vertex data consists of 9 floats.
      * - The first 3 floats are the vertex's 3D position vector.
      * - The second 3 floats are the vertex's 3D surface normal vector.
-     * - The third 3 floats are the vertex's RGB color information.
      *
      * Every 3 vertices create a triangle.
      */
 
     this->vertexCount = this->triangleCount * VERTICES_PER_TRIANGLE;
-    this->vertexDataSize = this->vertexCount * (VERTEX_SIZE + NORMAL_SIZE + COLOR_SIZE);
+    this->vertexDataSize = this->vertexCount * (VERTEX_SIZE + NORMAL_SIZE);
     this->vertexData = (float*)(malloc(this->vertexDataSize));
 
     this->fillVertexPositions(modelData);
     this->fillVertexSurfaceNormals();
-    this->fillVertexColors();
 
     glGenVertexArrays(1, &(this->vertexArray));
     glBindVertexArray(this->vertexArray);
@@ -116,8 +103,8 @@ Model::Model (const char* modelPath, glm::vec3 color)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(6 * sizeof(float)));
+    //glEnableVertexAttribArray(2);
 }
 
 Model::~Model ()
