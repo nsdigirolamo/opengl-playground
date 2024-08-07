@@ -68,14 +68,24 @@ int main ()
     Model object {
         "models/cube.obj",
         glm::vec3(0.0f),
-        glm::vec3(1.0, 0.5, 0.31),
+        {
+            glm::vec3(1.0f, 0.5f, 0.31f),
+            glm::vec3(1.0f, 0.5f, 0.31f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            32.0f
+        },
         glm::vec3(1.0f)
     };
 
     Model light {
         "models/cube.obj",
         glm::vec3(0.0f),
-        glm::vec3(1.0f),
+        {
+            glm::vec3(0.2f, 0.2f, 0.2f),
+            glm::vec3(0.5f, 0.5f, 0.5f),
+            glm::vec3(1.0f, 1.0f, 1.0f),
+            32.0f
+        },
         glm::vec3(0.2f)
     };
 
@@ -117,10 +127,18 @@ int main ()
 
         nonLightShader.use();
 
-        nonLightShader.setVec3("objectColor", object.color);
-        nonLightShader.setVec3("lightColor", light.color);
         nonLightShader.setVec3("lightPosition", light.position);
         nonLightShader.setVec3("viewPosition", camera.position);
+
+        nonLightShader.setVec3("objectMaterial.ambient", object.material.ambient);
+        nonLightShader.setVec3("objectMaterial.diffuse", object.material.diffuse);
+        nonLightShader.setVec3("objectMaterial.specular", object.material.specular);
+        nonLightShader.setFloat("objectMaterial.shine", object.material.shine);
+
+        nonLightShader.setVec3("lightMaterial.ambient", light.material.ambient);
+        nonLightShader.setVec3("lightMaterial.diffuse", light.material.diffuse);
+        nonLightShader.setVec3("lightMaterial.specular", light.material.specular);
+        nonLightShader.setFloat("lightMaterial.shine", light.material.shine);
 
         nonLightShader.setMat4("projection", projectionMat);
         nonLightShader.setMat4("view", viewMat);
@@ -143,13 +161,16 @@ int main ()
         scaleMat = glm::mat4(1.0f);
         scaleMat = glm::scale(scaleMat, light.scale);
 
-        lightShader.setVec3("lightColor", light.color);
-
         lightShader.setMat4("projection", projectionMat);
         lightShader.setMat4("view", viewMat);
         lightShader.setMat4("model", modelMat);
         lightShader.setMat4("translate", translateMat);
         lightShader.setMat4("scale", scaleMat);
+
+        lightShader.setVec3("lightMaterial.ambient", light.material.ambient);
+        lightShader.setVec3("lightMaterial.diffuse", light.material.diffuse);
+        lightShader.setVec3("lightMaterial.specular", light.material.specular);
+        lightShader.setFloat("lightMaterial.shine", light.material.shine);
 
         light.bindVertexBuffer();
         light.bindVertexArray();
