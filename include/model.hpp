@@ -5,6 +5,7 @@
 
 #include <stddef.h>
 #include <ostream>
+#include "material.hpp"
 
 #define VERTICES_PER_FACE 3
 #define VERTEX_SIZE sizeof(float) * 3
@@ -28,11 +29,11 @@ class Model
     public:
 
         glm::vec3 position;
-        glm::vec3 color;
+        Material material;
         glm::vec3 scale;
 
         Model (const char* objFilePath);
-        Model (const char* objFilePath, glm::vec3 position, glm::vec3 color, glm::vec3 scale);
+        Model (const char* objFilePath, glm::vec3 position, Material material, glm::vec3 scale);
         ~Model ();
 
         const size_t getVertexDataSize () const;
