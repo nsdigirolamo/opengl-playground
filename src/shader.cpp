@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <material.hpp>
 
 void Shader::checkCompilerErrors (unsigned int shader, std::string type)
 {
@@ -80,6 +81,11 @@ Shader::Shader (const char* vertexShaderPath, const char* fragmentShaderPath)
 void Shader::use ()
 {
     glUseProgram(this->programID);
+}
+
+void Shader::setFloat (const std::string &name, const float &num) const
+{
+    glUniform1f(glGetUniformLocation(this->programID, name.c_str()), num);
 }
 
 void Shader::setMat4 (const std::string &name, const glm::mat4 &mat) const
