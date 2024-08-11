@@ -10,8 +10,9 @@
 #define VERTICES_PER_FACE 3
 #define VERTEX_SIZE sizeof(float) * 3
 #define SURFACE_NORMAL_SIZE sizeof(float) * 3
+#define UV_COORDINATE_SIZE sizeof(float) * 2
 
-#define VERTEX_DATA_STRIDE 6
+#define VERTEX_DATA_STRIDE 8
 
 class Model
 {
