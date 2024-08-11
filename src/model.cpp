@@ -27,26 +27,34 @@ void Model::constructFromObj (const char* filePath)
     }
 
     unsigned int vertexCount = 0;
-    unsigned int surfaceNormalCount  = 0;
+    unsigned int surfaceNormalCount = 0;
+    unsigned int uvCoordinateCount = 0;
     unsigned int faceCount = 0;
 
     std::stringstream vertexStream;
     std::stringstream surfaceNormalStream;
+    std::stringstream uvCoordinateStream;
     std::stringstream faceStream;
 
     std::string line;
 
     while (std::getline(objDataStream, line))
     {
-        if (line[0] == 'v' && line[1] == 'n' && line[2] == ' ')
+
+        if (line[0] == 'v' && line[1] == ' ')
+        {
+            vertexStream << line << "\n";
+            ++vertexCount;
+        }
+        else if (line[0] == 'v' && line[1] == 'n' && line[2] == ' ')
         {
             surfaceNormalStream << line << "\n";
             ++surfaceNormalCount;
         }
-        else if (line[0] == 'v' && line[1] == ' ')
+        else if (line[0] == 'v' && line[1] == 't' && line[2] == ' ')
         {
-            vertexStream << line << "\n";
-            ++vertexCount;
+            uvCoordinateStream << line << "\n";
+            ++uvCoordinateCount;
         }
         else if (line[0] == 'f' && line[1] == ' ')
         {
@@ -57,6 +65,7 @@ void Model::constructFromObj (const char* filePath)
 
     glm::vec3* vertices = (glm::vec3*) malloc(vertexCount * sizeof(glm::vec3));
     glm::vec3* surfaceNormals = (glm::vec3*) malloc(surfaceNormalCount * sizeof(glm::vec3));
+    glm::vec2* uvCoordinates = (glm::vec2*) malloc(uvCoordinateCount * sizeof(glm::vec2));
 
     for (int i = 0; i < vertexCount; ++i)
     {
@@ -76,31 +85,39 @@ void Model::constructFromObj (const char* filePath)
         surfaceNormalStream >> surfaceNormals[i].z;
     }
 
+    for (int i = 0; i < uvCoordinateCount; ++i)
+    {
+        std::string throwAwayID;
+        uvCoordinateStream >> throwAwayID;
+        uvCoordinateStream >> uvCoordinates[i].x;
+        uvCoordinateStream >> uvCoordinates[i].y;
+    }
+
     this->vertexDataCount = faceCount * VERTICES_PER_FACE;
-    this->vertexDataSize = this->vertexDataCount * (VERTEX_SIZE + SURFACE_NORMAL_SIZE);
+    this->vertexDataSize = this->vertexDataCount * (VERTEX_SIZE + SURFACE_NORMAL_SIZE + UV_COORDINATE_SIZE);
     this->vertexData = (float*) malloc(this->vertexDataSize);
 
     for (int i = 0; i < faceCount; ++i) {
 
         std::string throwAwayID;
-        std::string faceVertex;
-
         faceStream >> throwAwayID;
 
         for (int j = 0; j < 3; ++j)
         {
             int vertexDataIndex = VERTEX_DATA_STRIDE * ((i * VERTICES_PER_FACE) + j);
 
-            faceStream >> faceVertex;
+            std::string vertexInfo;
+            faceStream >> vertexInfo;
 
-            int delimiterPosition;
-            int vertexIndex;
-            int surfaceNormalIndex;
+            int delimiterPosition = vertexInfo.find('/');
+            int vertexIndex = std::stoi(vertexInfo.substr(0, delimiterPosition)) - 1;
 
-            delimiterPosition = faceVertex.find("//");
+            vertexInfo = vertexInfo.substr(delimiterPosition + 1);
+            delimiterPosition = vertexInfo.find('/');
+            int uvCoordinateIndex = std::stoi(vertexInfo.substr(0, delimiterPosition)) - 1;
 
-            vertexIndex = std::stoi(faceVertex.substr(0, delimiterPosition)) - 1;
-            surfaceNormalIndex = std::stoi(faceVertex.substr(delimiterPosition + 2)) - 1;
+            vertexInfo = vertexInfo.substr(delimiterPosition + 1);
+            int surfaceNormalIndex = std::stoi(vertexInfo) - 1;
 
             this->vertexData[vertexDataIndex] = vertices[vertexIndex].x;
             this->vertexData[vertexDataIndex + 1] = vertices[vertexIndex].y;
@@ -109,11 +126,15 @@ void Model::constructFromObj (const char* filePath)
             this->vertexData[vertexDataIndex + 3] = surfaceNormals[surfaceNormalIndex].x;
             this->vertexData[vertexDataIndex + 4] = surfaceNormals[surfaceNormalIndex].y;
             this->vertexData[vertexDataIndex + 5] = surfaceNormals[surfaceNormalIndex].z;
+
+            this->vertexData[vertexDataIndex + 6] = uvCoordinates[uvCoordinateIndex].x;
+            this->vertexData[vertexDataIndex + 7] = uvCoordinates[uvCoordinateIndex].y;
         }
     }
 
     free(vertices);
     free(surfaceNormals);
+    free(uvCoordinates);
 }
 
 Model::Model (const char* objFilePath)
@@ -150,6 +171,9 @@ Model::Model (const char* objFilePath, glm::vec3 position, Material material, gl
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_DATA_STRIDE * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 }
 
 Model::~Model ()
@@ -197,14 +221,14 @@ std::ostream& operator<<(std::ostream& os, const Model& model)
 
         for (int j = 0; j < VERTEX_DATA_STRIDE; ++j)
         {
-            if (j % 3 == 0)
+            if (j == 0 || j == 3 || j == 6)
             {
                 os << "[ ";
             }
 
             os << std::setw(10) << std::fixed << std::setprecision(7) << vertices[vertexIdx + j] << " ";
 
-            if (j % 3 == 2)
+            if (j == 2 || j == 5 || j == 7)
             {
                 os << "], ";
             }
