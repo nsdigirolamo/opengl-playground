@@ -64,18 +64,24 @@ int main ()
 
     glEnable(GL_DEPTH_TEST);
 
-    Shader nonLightShader { "shaders/texture_tests/nonlight.vert.glsl", "shaders/texture_tests/nonlight.frag.glsl" };
-    Shader lightShader { "shaders/texture_tests/light.vert.glsl", "shaders/texture_tests/light.frag.glsl" };
+    Shader nonLightShader { "shaders/nonlight.vert.glsl", "shaders/nonlight.frag.glsl" };
+    Shader lightShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
 
-    Texture texture {
-        "textures/box_texture.png"
+    Texture diffuseMap {
+        "textures/box_texture_diffuse_map.png"
+    };
+
+    Texture specularMap {
+        "textures/box_texture_specular_map.png"
     };
 
     Material material {
-        texture.getID(),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        32.0f
+        diffuseMap.getID(),
+        specularMap.getID(),
+        64.0f
     };
+
+    std::cout << material.diffuse << " " << material.specular << std::endl;
 
     Light light {
         glm::vec3(0.2f, 0.2f, 0.2f),
@@ -98,7 +104,7 @@ int main ()
     Camera camera;
 
     double previousTime = glfwGetTime();
-
+    
     while (!glfwWindowShouldClose(window))
     {
         double currentTime = glfwGetTime();
@@ -137,7 +143,7 @@ int main ()
         nonLightShader.setVec3("viewPosition", camera.position);
 
         nonLightShader.setInt("objectMaterial.diffuse", 0);
-        nonLightShader.setVec3("objectMaterial.specular", material.specular);
+        nonLightShader.setInt("objectMaterial.specular", 1);
         nonLightShader.setFloat("objectMaterial.shine", material.shine);
 
         nonLightShader.setVec3("light.ambient", light.ambient);
@@ -152,6 +158,8 @@ int main ()
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.diffuse);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, material.specular);
 
         objectModel.bindVertexBuffer();
         objectModel.bindVertexArray();

@@ -6,7 +6,7 @@
 
 struct Material {
     GLuint diffuse;
-    glm::vec3 specular;
+    GLuint specular;
     float shine;
 };
 
