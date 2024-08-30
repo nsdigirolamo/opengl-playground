@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <model.hpp>
+#include <texture.hpp>
+#include <light.hpp>
 
 constexpr unsigned int WINDOW_WIDTH = 1600;
 constexpr unsigned int WINDOW_HEIGHT = 800;
@@ -65,34 +67,44 @@ int main ()
     Shader nonLightShader { "shaders/nonlight.vert.glsl", "shaders/nonlight.frag.glsl" };
     Shader lightShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
 
-    Model object {
+    Texture diffuseMap {
+        "textures/box_texture_diffuse_map.png"
+    };
+
+    Texture specularMap {
+        "textures/box_texture_specular_map.png"
+    };
+
+    Material material {
+        diffuseMap.getID(),
+        specularMap.getID(),
+        64.0f
+    };
+
+    std::cout << material.diffuse << " " << material.specular << std::endl;
+
+    Light light {
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(1.0f, 1.0f, 1.0f)
+    };
+
+    Model objectModel {
         "models/cube.obj",
         glm::vec3(0.0f),
-        {
-            glm::vec3(1.0f, 0.5f, 0.31f),
-            glm::vec3(1.0f, 0.5f, 0.31f),
-            glm::vec3(0.5f, 0.5f, 0.5f),
-            32.0f
-        },
         glm::vec3(1.0f)
     };
 
-    Model light {
+    Model lightModel {
         "models/cube.obj",
         glm::vec3(0.0f),
-        {
-            glm::vec3(0.2f, 0.2f, 0.2f),
-            glm::vec3(0.5f, 0.5f, 0.5f),
-            glm::vec3(1.0f, 1.0f, 1.0f),
-            32.0f
-        },
         glm::vec3(0.2f)
     };
 
     Camera camera;
 
     double previousTime = glfwGetTime();
-
+    
     while (!glfwWindowShouldClose(window))
     {
         double currentTime = glfwGetTime();
@@ -120,25 +132,23 @@ int main ()
         glm::mat4 modelMat = glm::mat4(1.0f);
 
         glm::mat4 translateMat = glm::mat4(1.0f);
-        translateMat = glm::translate(translateMat, object.position);
+        translateMat = glm::translate(translateMat, objectModel.position);
 
         glm::mat4 scaleMat = glm::mat4(1.0f);
-        scaleMat = glm::scale(scaleMat, object.scale);
+        scaleMat = glm::scale(scaleMat, objectModel.scale);
 
         nonLightShader.use();
 
-        nonLightShader.setVec3("lightPosition", light.position);
+        nonLightShader.setVec3("lightPosition", lightModel.position);
         nonLightShader.setVec3("viewPosition", camera.position);
 
-        nonLightShader.setVec3("objectMaterial.ambient", object.material.ambient);
-        nonLightShader.setVec3("objectMaterial.diffuse", object.material.diffuse);
-        nonLightShader.setVec3("objectMaterial.specular", object.material.specular);
-        nonLightShader.setFloat("objectMaterial.shine", object.material.shine);
+        nonLightShader.setInt("objectMaterial.diffuse", 0);
+        nonLightShader.setInt("objectMaterial.specular", 1);
+        nonLightShader.setFloat("objectMaterial.shine", material.shine);
 
-        nonLightShader.setVec3("lightMaterial.ambient", light.material.ambient);
-        nonLightShader.setVec3("lightMaterial.diffuse", light.material.diffuse);
-        nonLightShader.setVec3("lightMaterial.specular", light.material.specular);
-        nonLightShader.setFloat("lightMaterial.shine", light.material.shine);
+        nonLightShader.setVec3("light.ambient", light.ambient);
+        nonLightShader.setVec3("light.diffuse", light.diffuse);
+        nonLightShader.setVec3("light.specular", light.specular);
 
         nonLightShader.setMat4("projection", projectionMat);
         nonLightShader.setMat4("view", viewMat);
@@ -146,20 +156,25 @@ int main ()
         nonLightShader.setMat4("translate", translateMat);
         nonLightShader.setMat4("scale", scaleMat);
 
-        object.bindVertexBuffer();
-        object.bindVertexArray();
-        object.drawVertexArray();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, material.diffuse);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, material.specular);
+
+        objectModel.bindVertexBuffer();
+        objectModel.bindVertexArray();
+        objectModel.drawVertexArray();
 
         lightShader.use();
 
-        light.position.x = 5 * sin(currentTime);
-        light.position.z = 5 * cos(currentTime);
+        lightModel.position.x = 5 * sin(currentTime);
+        lightModel.position.z = 5 * cos(currentTime);
 
         translateMat = glm::mat4(1.0f);
-        translateMat = glm::translate(translateMat, light.position);
+        translateMat = glm::translate(translateMat, lightModel.position);
 
         scaleMat = glm::mat4(1.0f);
-        scaleMat = glm::scale(scaleMat, light.scale);
+        scaleMat = glm::scale(scaleMat, lightModel.scale);
 
         lightShader.setMat4("projection", projectionMat);
         lightShader.setMat4("view", viewMat);
@@ -167,14 +182,13 @@ int main ()
         lightShader.setMat4("translate", translateMat);
         lightShader.setMat4("scale", scaleMat);
 
-        lightShader.setVec3("lightMaterial.ambient", light.material.ambient);
-        lightShader.setVec3("lightMaterial.diffuse", light.material.diffuse);
-        lightShader.setVec3("lightMaterial.specular", light.material.specular);
-        lightShader.setFloat("lightMaterial.shine", light.material.shine);
+        lightShader.setVec3("light.ambient", light.ambient);
+        lightShader.setVec3("light.diffuse", light.diffuse);
+        lightShader.setVec3("light.specular", light.specular);
 
-        light.bindVertexBuffer();
-        light.bindVertexArray();
-        light.drawVertexArray();
+        lightModel.bindVertexBuffer();
+        lightModel.bindVertexArray();
+        lightModel.drawVertexArray();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

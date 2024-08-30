@@ -1,6 +1,5 @@
 #version 330 core
 layout (location = 0) in vec3 positionAttribute;
-layout (location = 1) in vec3 surfaceNormalAttribute;
 
 uniform mat4 model;
 uniform mat4 view;
