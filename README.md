@@ -4,15 +4,12 @@ This is an OpenGL project I'm working on to teach myself the API. Eventually
 it will be a 3D solitaire game, but for now it's a playground I'm using to teach
 myself OpenGL with [this tutorial by Joey de Vries.](https://learnopengl.com/)
 
-This repository contains the following libraries:
+This repository contains the following external libraries/files:
 
 - glad [(license)](https://github.com/Dav1dde/glad/blob/glad2/LICENSE)
 - glm [(license)](https://github.com/g-truc/glm/blob/master/manual.md#section0)
 - khrplatform
-
-The [models](https://github.com/nsdigirolamo/opengl-solitaire/tree/main/models)
-directory contains a 3D model of the Utah Teapot sourced from
-[this webpage.](https://users.cs.utah.edu/~dejohnso/models/teapot.html)
+- stb_image [(license)](https://github.com/nothings/stb/blob/master/LICENSE)
 
 To build this project, make sure you have [cmake](https://cmake.org/) and
 [GLFW](https://www.glfw.org/) installed on your system. I have only ever built
