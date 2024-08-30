@@ -8,6 +8,7 @@ set(SOLSOURCES
     src/camera.cpp
     src/model.cpp
     src/solitaire-window.cpp
+    src/texture.cpp
 )
 
 add_executable(solitaire ${SOLSOURCES})
