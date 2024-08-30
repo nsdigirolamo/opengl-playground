@@ -137,23 +137,8 @@ void Model::constructFromObj (const char* filePath)
     free(uvCoordinates);
 }
 
-Model::Model (const char* objFilePath)
-    : Model(
-        objFilePath,
-        glm::vec3(0.0f),
-        {
-            glm::vec3(1.0f, 1.0f, 1.0f),
-            glm::vec3(1.0f, 1.0f, 1.0f),
-            glm::vec3(1.0f, 1.0f, 1.0f),
-            32.0f
-        },
-        glm::vec3(1.0f)
-    )
-{ }
-
-Model::Model (const char* objFilePath, glm::vec3 position, Material material, glm::vec3 scale)
+Model::Model (const char* objFilePath, glm::vec3 position, glm::vec3 scale)
     : position(position)
-    , material(material)
     , scale(scale)
 {
     this->constructFromObj(objFilePath);
