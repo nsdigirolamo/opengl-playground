@@ -137,9 +137,7 @@ void Model::constructFromObj (const char* filePath)
     free(uvCoordinates);
 }
 
-Model::Model (const char* objFilePath, glm::vec3 position, glm::vec3 scale)
-    : position(position)
-    , scale(scale)
+Model::Model (const char* objFilePath)
 {
     this->constructFromObj(objFilePath);
 
