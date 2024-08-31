@@ -29,10 +29,7 @@ class Model
 
     public:
 
-        glm::vec3 position;
-        glm::vec3 scale;
-
-        Model (const char* objFilePath, glm::vec3 position, glm::vec3 scale);
+        Model (const char* objFilePath);
         ~Model ();
 
         const size_t getVertexDataSize () const;

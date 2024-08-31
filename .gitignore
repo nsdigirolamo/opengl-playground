@@ -1,5 +1,6 @@
 # Dotfiles
 .vscode
+build
 
 # CMake Files
 CMakeFiles
