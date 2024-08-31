@@ -4,8 +4,9 @@ out vec4 fragmentColor;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+	sampler2D emissive;
     float     shine;
-}; 
+};
 
 struct Light {
 	vec3 ambient;
@@ -36,5 +37,7 @@ void main()
 	float specularStrength = pow(max(dot(viewDirection, reflectDirection), 0.0), objectMaterial.shine);
 	vec3 specular = light.specular * specularStrength * texture(objectMaterial.specular, uvCoordinate).rgb;
 
-	fragmentColor = vec4(ambient + diffuse + specular, 1.0);
+	vec3 emissive = texture(objectMaterial.emissive, uvCoordinate).rgb;
+
+	fragmentColor = vec4(ambient + diffuse + specular + emissive, 1.0);
 }
