@@ -10,13 +10,11 @@ out vec2 uvCoordinate;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 translate;
-uniform mat4 scale;
 
 void main()
 {
 	fragmentPosition = vec3(model * vec4(positionAttribute, 1.0));
-	surfaceNormal = mat3(transpose(inverse(model))) * surfaceNormalAttribute;
+	surfaceNormal = normalize(mat3(transpose(inverse(model))) * surfaceNormalAttribute);
 	uvCoordinate = uvCoordinateAttribute;
-	gl_Position = projection * view * translate * scale * vec4(fragmentPosition, 1.0);
+	gl_Position = projection * view * vec4(fragmentPosition, 1.0);
 }
