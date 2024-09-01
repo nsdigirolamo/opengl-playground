@@ -1,15 +1,9 @@
 #version 330 core
 out vec4 fragmentColor;
 
-struct Light {
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-};
-
-uniform Light light;
+uniform vec3 color;
 
 void main()
 {
-	fragmentColor = vec4(light.specular, 1.0);
+	fragmentColor = vec4(color, 1.0);
 }
