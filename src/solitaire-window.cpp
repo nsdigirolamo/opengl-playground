@@ -65,8 +65,8 @@ int main ()
 
     glEnable(GL_DEPTH_TEST);
 
-    Shader lightingShader { "shaders/nonlight.vert.glsl", "shaders/nonlight.frag.glsl" };
-    Shader sourceShader { "shaders/light.vert.glsl", "shaders/light.frag.glsl" };
+    Shader lightingShader { "shaders/lighting.vert.glsl", "shaders/lighting.frag.glsl" };
+    Shader sourceShader { "shaders/source.vert.glsl", "shaders/source.frag.glsl" };
 
     Model cubeModel { "models/cube.obj" };
     Texture diffuseMap { "textures/box_texture_diffuse_map.png" };
