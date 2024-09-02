@@ -1,8 +1,8 @@
 # OpenGL Solitaire
 
 This is an OpenGL project I'm working on to teach myself the API. Eventually
-it will be a 3D solitaire game, but for now it's a playground I'm using to teach
-myself OpenGL with [this tutorial by Joey de Vries.](https://learnopengl.com/)
+it may transform into something larger, but for now it's a playground I'm using 
+to teach myself OpenGL with [this tutorial by Joey de Vries.](https://learnopengl.com/)
 
 This repository contains the following external libraries/files:
 
